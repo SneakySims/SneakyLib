@@ -72,3 +72,19 @@ Unsupported IFF chunks are parsed as `UnknownChunk` and are written to the IFF f
         ImageIO.write(image, "png", File("spr_${index}.png"))
     }
 ```
+
+## Maven
+
+While the library is still very unfinished and very experimental, you can use it in your projects already!
+
+### Repository
+```kotlin
+maven("https://repo.perfectdreams.net/")
+```
+
+### Dependency
+```kotlin
+implementation("net.sneakysims.sneakylib:sneakylib:0.0.0-ShortCommitHash")
+```
+
+The `ShortCommitHash` is the short commit hash of the version that you want to use.
