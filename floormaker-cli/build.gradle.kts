@@ -3,8 +3,7 @@ plugins {
     application
 }
 
-group = "net.sneakysims.floormaker.cli"
-version = "1.0-SNAPSHOT"
+group = "net.sneakysims.floormaker"
 
 repositories {
     mavenCentral()

@@ -1,9 +1,9 @@
 plugins {
     kotlin("multiplatform")
+    id("maven-publish")
 }
 
 group = "net.sneakysims.sneakylib"
-version = "1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
@@ -41,6 +41,16 @@ kotlin {
             dependencies {
                 implementation(kotlin("test"))
             }
+        }
+    }
+}
+
+publishing {
+    repositories {
+        maven {
+            name = "PerfectDreams"
+            url = uri("https://repo.perfectdreams.net/")
+            credentials(PasswordCredentials::class)
         }
     }
 }

@@ -3,7 +3,6 @@ plugins {
 }
 
 group = "net.sneakysims.sneakylib"
-version = "1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
