@@ -36,7 +36,16 @@ Unsupported IFF chunks are parsed as `UnknownChunk` and are written to the IFF f
 * You can't use more than 256 colors on your `PALT`, it just corrupts the colors when rendering the sprite and, depending on the `PALT` size, the game may crash!
 * `floors.iff` contains sprites that doesn't seem to be in `SPR#` format that suspiciously the chunk names are `.tga` files, why is that?
 * The lib original name was "SimsLib", but I've decided to change to "SneakyLib" to avoid confusion with FreeSO's "SimsLib" and SimTech's "SimLib"
-
+* The road lines floor tiles are special: They rotate WITH the camera, and this seems to be hardcoded in the game, the sprites in the world swap automatically depending on your rotation.
+    * I think that they hardcoded on the engine itself, because these are the only floor types that have this behavior, even tho there are other floor types in the game (even on expansion packs!) that would be better if they had proper rotations.
+* The "Catalog" BMP files in the `floors.iff` seems to be unused, you can delete them from the game and the game still renders the catalog sprites correctly.
+* The sound of the floors is controlled by the chunk name of the first (far distance) floor, example:
+    * Soft Sound: `SR11GFFB00`
+    * Medium Sound: `MR11GFFB00`
+    * Hard Sound: `HR11GFFB00`
+    * These values were checked by generating multiple floors in Maxis' HomeCrafter and comparing the differences between the floors.
+    * It is unknown what the other values mean.
+  
 ### Reading SPR# Images and Converting
 
 ```kotlin
