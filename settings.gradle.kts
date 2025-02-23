@@ -6,3 +6,5 @@ rootProject.name = "SneakyLib"
 include(":slippyimage")
 include(":sneakylib")
 include(":sneakylib-samples:scratchpad")
+include(":floormaker-common")
+include(":floormaker-cli")

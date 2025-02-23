@@ -1,4 +1,5 @@
-import net.sneakysims.sneakylib.Color
+
+import net.perfectdreams.slippyimage.Color
 import net.sneakysims.sneakylib.iff.*
 import net.sneakysims.sneakylib.sims.TheSimsLanguage
 import java.awt.Image

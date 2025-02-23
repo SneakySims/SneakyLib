@@ -7,6 +7,9 @@ This is VERY early, hacky and unfinished!
 If you want to take a peek at some code examples, check out the `sneakylib-samples/scratchpad` folder
 
 If you want to take a peek at real tools that were made using this lib, check out the [Wallpaper Maker](https://sneakysims.net/tools/wallpaper-maker) and the [FAR to ZIP converter](https://sneakysims.net/tools/far-to-zip)! (Don't worry, I will open source these tools later, and maybe even create some quick 'n' dirty CLI versions of them :3)
+
+Another good example is the `:floormaker-common` and `:floormaker-cli` modules.
+
 ## Supported Formats
 
 ### FAR
@@ -45,7 +48,9 @@ Unsupported IFF chunks are parsed as `UnknownChunk` and are written to the IFF f
     * Hard Sound: `HR11GFFB00`
     * These values were checked by generating multiple floors in Maxis' HomeCrafter and comparing the differences between the floors.
     * It is unknown what the other values mean.
-  
+* The game automatically replaces missing wall/floor strings with default text from `Build.iff`'s `PluginWall` and `PluginFloor`
+* SimTech says that `SPR#` is used for floors, but that's not the case, all floors use `SPR2`!
+
 ### Reading SPR# Images and Converting
 
 ```kotlin

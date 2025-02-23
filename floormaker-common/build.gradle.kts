@@ -2,7 +2,7 @@ plugins {
     kotlin("multiplatform")
 }
 
-group = "net.sneakysims.sneakylib"
+group = "net.sneakysims.floormaker"
 version = "1.0-SNAPSHOT"
 
 repositories {
@@ -23,17 +23,8 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(kotlin("stdlib-common"))
+                implementation(project(":sneakylib"))
                 implementation(project(":slippyimage"))
-            }
-        }
-
-        val jsMain by getting {
-            dependencies {
-                implementation(npm("iconv-lite", "0.6.3"))
-                implementation(npm("buffer", "6.0.3")) // iconv-lite needs this
-                // Not strictly required but it does have some nice extension methods
-                implementation("org.jetbrains.kotlin-wrappers:kotlin-browser:2025.2.5")
             }
         }
 

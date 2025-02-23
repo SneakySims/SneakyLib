@@ -1,6 +1,6 @@
 package net.sneakysims.sneakylib.iff
 
-import net.sneakysims.sneakylib.Color
+import net.perfectdreams.slippyimage.Color
 import net.sneakysims.sneakylib.utils.ByteArrayReader
 import net.sneakysims.sneakylib.utils.ByteArrayWriter
 

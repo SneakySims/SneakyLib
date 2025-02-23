@@ -1,4 +1,3 @@
-import net.sneakysims.sneakylib.Color
 import net.sneakysims.sneakylib.iff.*
 import net.sneakysims.sneakylib.sims.TheSimsLanguage
 import java.awt.image.BufferedImage
@@ -6,10 +5,11 @@ import java.io.File
 import javax.imageio.ImageIO
 
 fun main() {
-    val input = File("C:\\Program Files (x86)\\Maxis\\The Sims\\GameData\\floors.iff")
+    val input = File("C:\\Program Files (x86)\\Maxis\\The Sims\\GameData\\Floors\\noise.flr")
 
     val iff = IFF.read(input.readBytes())
-    dumpSPR2(iff, "flrspr2")
+
+    dumpSPR2(iff, "noiseflr")
     /* val iff = IFF.empty()
 
     iff.chunks.add(
