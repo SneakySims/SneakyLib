@@ -1,5 +1,8 @@
 package net.perfectdreams.slippyimage
 
+import kotlin.math.cos
+import kotlin.math.sin
+
 class SlippyImage(
     val width: Int,
     val height: Int,
@@ -130,6 +133,74 @@ class SlippyImage(
         }
 
         return newImageData
+    }
+
+    /**
+     * Gets the current image but rotated by [radians] radians
+     *
+     * The result is this image but rotated by [radians] around its center
+     */
+    fun SlippyImage.getRotatedInstance(
+        radians: Double
+    ): SlippyImage {
+        // Cached results, yay!
+        val sinTheta = sin(radians)
+        val cosTheta = cos(radians)
+        // Yes, it is + instead of -
+        // https://stackoverflow.com/a/57778745/7271796
+        val newWidth = (this.width * cosTheta) + (this.height * sinTheta)
+        val newHeight = (this.height * cosTheta) + (this.width * sinTheta)
+
+        println("New width: $newWidth")
+        println("New height: $newHeight")
+
+        // Rotate around the original image center
+        val pivotX = this.width / 2f
+        val pivotY = this.height / 2f
+
+        val outputCenterX = newWidth / 2f
+        val outputCenterY = newHeight / 2f
+
+        val offsetX = -outputCenterX
+        val offsetY = -outputCenterY
+
+        // First we calculate the new width and height based on the current rotation
+        // TODO: I think we should round this up?
+        val dst = SlippyImage.createEmpty(newWidth.toInt(), newHeight.toInt())
+        val newImage = dst
+
+        for (newY in 0 until newImage.height) {
+            for (newX in 0 until newImage.width) {
+                // For each pixel, we will attempt to find the original pixel in the input
+                // Similar to how OpenGL fragment shaders work!
+                //
+                // The algorithm is...
+                // x′ = x cos(θ) − y sin(θ)
+                // y′ = y cos(θ) + x sin(θ)
+                // Well, that's confusing because that's in math terms and I'm stupid, so here it is in programmer terms...
+                // newX = (x * cos(radians)) - (y * sin(radians))
+                // newY = (y * cos(radians)) + (x * sin(radians))
+                // Ahhh, much better!
+
+                // https://math.stackexchange.com/a/1964911
+                // x′=5+(x−5)cos(φ)−(y−10)sin(φ)
+                // y′=10+(x−5)sin(φ)+(y−10)cos(φ)
+                val newXWithOffset = newX + offsetX
+                val newYWithOffset = newY + offsetY
+
+                val originalXAsDouble = pivotX + (newXWithOffset) * cosTheta - (newYWithOffset) * sinTheta
+                val originalYAsDouble = pivotY + (newXWithOffset) * sinTheta + (newYWithOffset) * cosTheta
+
+                val originalX = originalXAsDouble.toInt()
+                val originalY = originalYAsDouble.toInt()
+
+                if (originalX in 0 until this.width && originalY in 0 until this.height) {
+                    dst.setRGB(newX, newY, this.getRGB(originalX, originalY))
+                }
+            }
+        }
+
+        return newImage
     }
 
     /* fun setRGB(x: Int, y: Int, width: Int, height: Int, pixels: IntArray) {
