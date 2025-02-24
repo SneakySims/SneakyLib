@@ -256,6 +256,9 @@ class SPR2ChunkData(
             buffer.writeShortLe(sprite.imageData.width)
             buffer.writeShortLe(sprite.imageData.height)
             buffer.writeShortLe(sprite.flags)
+            if (sprite.flags != 1.toShort() && sprite.flags != 3.toShort() && sprite.flags != 7.toShort())
+                error("Unsupported SPR2 flag! ${sprite.flags}")
+
             buffer.writeShortLe(sprite.unknown)
             buffer.writeShortLe(sprite.overridenPaletteId)
             buffer.writeShortLe(sprite.transparentPixelPaletteIndexId)
@@ -286,11 +289,25 @@ class SPR2ChunkData(
                     if (pixelData.alphaBlending == 0u.toUByte()) {
                         pixelCommandBuffer.writeUShortLe(SPR2Utils.packSectionHeader(0x03, 1))
                     } else {
-                        pixelCommandBuffer.writeUShortLe(SPR2Utils.packSectionHeader(0x06, 1))
-                        pixelCommandBuffer.writeUByte(pixelData.paletteIndex)
+                        if (sprite.flags == 1.toShort()) {
+                            pixelCommandBuffer.writeUShortLe(SPR2Utils.packSectionHeader(0x06, 1))
+                            pixelCommandBuffer.writeUByte(pixelData.paletteIndex)
 
-                        // It is always odd
-                        pixelCommandBuffer.writeUByte(176u) // Padding if odd
+                            // It is always odd
+                            pixelCommandBuffer.writeUByte(176u) // Padding if odd
+                        } else if (sprite.flags == 3.toShort()) {
+                            pixelCommandBuffer.writeUShortLe(SPR2Utils.packSectionHeader(0x01, 1))
+                            pixelCommandBuffer.writeUByte(pixelData.depthBuffer)
+                            pixelCommandBuffer.writeUByte(pixelData.paletteIndex)
+                        } else if (sprite.flags == 7.toShort()) {
+                            pixelCommandBuffer.writeUShortLe(SPR2Utils.packSectionHeader(0x02, 1))
+                            pixelCommandBuffer.writeUByte(pixelData.depthBuffer)
+                            pixelCommandBuffer.writeUByte(pixelData.paletteIndex)
+                            pixelCommandBuffer.writeUByte(pixelData.alphaBlending)
+
+                            // It is always odd
+                            pixelCommandBuffer.writeUByte(176u) // Padding if odd
+                        }
                     }
                 }
 
