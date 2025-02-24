@@ -53,6 +53,8 @@ class ByteArrayReader(val byteArray: ByteArray) {
     }
 
     fun readBytes(length: Int): ByteArray {
+        if (length + this.position > this.byteArray.size)
+            error("Trying to read more bytes than what's present! ${length + this.position} > ${this.byteArray.size}")
         val target = ByteArray(length)
 
         repeat(length) {

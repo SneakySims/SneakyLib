@@ -14,6 +14,12 @@ object BinaryUtils {
         )
     }
 
+    fun combineBytesToInt(b1: Byte, b2: Byte, b3: Byte): Int {
+        return (b1.toInt() and 0xFF shl 16) or
+                (b2.toInt() and 0xFF shl 8) or
+                (b3.toInt() and 0xFF)
+    }
+
     // From kotlinx-io
     fun Int.reverseBytes(): Int {
         return (this and -0x1000000 ushr 24) or
@@ -38,5 +44,13 @@ object BinaryUtils {
         val reversed = (i and 0xff00 ushr 8) or
                 (i and 0x00ff shl 8)
         return reversed.toShort()
+    }
+
+    fun isMostSignificantBitSet(value: UInt): Boolean {
+        return (value and 0x80000000u) != 0u
+    }
+
+    fun clearMostSignificantBit(value: UInt): UInt {
+        return value and 0x7FFFFFFFu  // 0x7FFFFFFF masks out the MSB
     }
 }
