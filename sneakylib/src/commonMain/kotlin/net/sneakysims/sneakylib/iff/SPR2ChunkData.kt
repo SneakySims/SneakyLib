@@ -39,6 +39,7 @@ class SPR2ChunkData(
     )
 
     companion object {
+        @OptIn(ExperimentalStdlibApi::class)
         fun read(byteArray: ByteArray): SPR2ChunkData {
             val byteBuffer = ByteArrayReader(byteArray)
 
@@ -96,7 +97,6 @@ class SPR2ChunkData(
 
                 val imageDataRows = mutableListOf<IntArray>()
 
-                // TODO: Parse segments
                 while (true) {
                     println("Reading sprite...")
                     // This is a bit of a pain to parse compared to SPR#, but let's go!
@@ -149,7 +149,7 @@ class SPR2ChunkData(
                                 when (formatCode) {
                                     0x01 -> {
                                         // Code one has two bytes of data per pixel, the depth and the palette color index.
-                                        repeat(pixelCount.toInt()) {
+                                        repeat(pixelCount) {
                                             val depth = byteBuffer.readUByte()
                                             val paletteColorIndex = byteBuffer.readUByte()
 
@@ -160,43 +160,43 @@ class SPR2ChunkData(
                                     0x02 -> {
                                         // Code two has three bytes of data per pixel, the depth, the palette color index, and the alpha blending.
                                         // If the pixel count is odd, an alignment byte with value 0xB0 pads the length to even.
-                                        val depth = byteBuffer.readUByte()
-                                        val paletteColorIndex = byteBuffer.readUByte()
-                                        val alphaBlending = byteBuffer.readUByte()
+                                        repeat(pixelCount) {
+                                            val depth = section.readUByte()
+                                            val paletteColorIndex = section.readUByte()
+                                            val alphaBlending = section.readUByte()
 
-                                        repeat(pixelCount.toInt()) {
                                             imageDataRow[imageDataIndex++] = SPR2Utils.packPixelData(paletteColorIndex, alphaBlending, depth)
                                         }
 
-                                        val isOdd = pixelCount.toInt() % 2 == 1
+                                        val isOdd = pixelCount % 2 == 1
                                         if (isOdd) {
                                             println("is odd!")
                                             val padding = section.readUByte()
                                             if (padding != 0xB0.toUByte())
-                                                error("Padding is not 0xB0! Something went wrong during the decoding process! Padding value: $padding")
+                                                error("Padding is not 0xB0! Something went wrong during the decoding process! Padding value: $padding; Pixel Count: $pixelCount; Position: ${section.position}; Section Bytes: ${sectionBytes.toHexString(HexFormat.UpperCase)}")
                                         }
                                     }
 
                                     0x03 -> {
                                         // Code three has no pixel data. The pixel count is the number of pixels that are transparent (show the background).
-                                        repeat(pixelCount.toInt()) {
+                                        repeat(pixelCount) {
                                             imageDataRow[imageDataIndex++] = SPR2Utils.packPixelData(0u, 0u, 255u)
                                         }
                                     }
 
                                     0x06 -> {
                                         // Code six has one byte of data per pixel, the palette color index. If the pixel count is odd, an alignment byte with value 0xB0 pads the length to even.
-                                        repeat(pixelCount.toInt()) {
+                                        repeat(pixelCount) {
                                             val paletteColorIndex = section.readUByte()
                                             imageDataRow[imageDataIndex++] = SPR2Utils.packPixelData(paletteColorIndex, 255u, 255u)
                                         }
 
-                                        val isOdd = pixelCount.toInt() % 2 == 1
+                                        val isOdd = pixelCount % 2 == 1
                                         if (isOdd) {
                                             println("is odd!")
                                             val padding = section.readUByte()
                                             if (padding != 0xB0.toUByte())
-                                                error("Padding is not 0xB0! Something went wrong during the decoding process! Padding value: $padding")
+                                                error("Padding is not 0xB0! Something went wrong during the decoding process! Padding value: $padding; Pixel Count: $pixelCount; Position: ${section.position}; Section Bytes: ${sectionBytes.toHexString(HexFormat.UpperCase)}")
                                         }
                                     }
 
@@ -264,38 +264,31 @@ class SPR2ChunkData(
 
             // TODO: This encoder is not *that* good yet
             //  Example: The empty row write could be optimized
+            //  Currently we write EVERY pixel instead of using SPR2 compression
             for (row in sprite.imageData.data) {
-                val isThisRowFullyEmpty = row.all { it == SPRImageData.TRANSPRENCY_INDEX }
+                // We will create a new buffer because we will need to get the section size here
+                val pixelCommandBuffer = ByteArrayWriter()
 
-                // This row is fully empty,
-                if (isThisRowFullyEmpty) {
-                    // Row Header
-                    // Empty row with only one row, we could optimize this later by doing an "are all next rows empty?" check
-                    buffer.writeUShortLe(SPR2Utils.packSectionHeader(0x04, 0x01))
-                } else {
-                    // We will create a new buffer because we will need to get the section size here
-                    val pixelCommandBuffer = ByteArrayWriter()
-
-                    // We want to write palette color indexes
-                    // The entire row size INCLUDING the header
-                    pixelCommandBuffer.writeUShortLe(SPR2Utils.packSectionHeader(0x02, row.size))
-                    for (packedData in row) {
-                        // TODO: We need to support other kinds of commands (like only palette index, that sort of thing)
-                        val (paletteIndex, alphaBlending, depthBuffer) = SPR2Utils.unpackPixelData(packedData)
-                        pixelCommandBuffer.writeUByte(depthBuffer)
-                        pixelCommandBuffer.writeUByte(paletteIndex)
-                        pixelCommandBuffer.writeUByte(alphaBlending)
-                    }
-
-                    val isOdd = row.size % 2 == 1
-                    if (isOdd) {
-                        pixelCommandBuffer.writeUByte(176u) // Padding if odd
-                    }
-
-                    // Row Header
-                    buffer.writeUShortLe(SPR2Utils.packSectionHeader(0x00, pixelCommandBuffer.bytes.size + 2)) // Section size - We do +2 because this includes this and the command
-                    buffer.writeBytes(pixelCommandBuffer.asByteArray())
+                // We want to write palette color indexes
+                // The header is the command + the amount of pixels in this row (so, if we are using command 0x02 with 8 pixels, that would be 8 * 3 bytes, but the amount
+                // in the header would still be 8)
+                pixelCommandBuffer.writeUShortLe(SPR2Utils.packSectionHeader(0x02, row.size))
+                for (packedData in row) {
+                    // TODO: We need to support other kinds of commands (like only palette index, that sort of thing)
+                    val (paletteIndex, alphaBlending, depthBuffer) = SPR2Utils.unpackPixelData(packedData)
+                    pixelCommandBuffer.writeUByte(depthBuffer)
+                    pixelCommandBuffer.writeUByte(paletteIndex)
+                    pixelCommandBuffer.writeUByte(alphaBlending)
                 }
+
+                val isOdd = row.size % 2 == 1
+                if (isOdd) {
+                    pixelCommandBuffer.writeUByte(176u) // Padding if odd
+                }
+
+                // Row Header
+                buffer.writeUShortLe(SPR2Utils.packSectionHeader(0x00, pixelCommandBuffer.bytes.size + 2)) // Section size - We do +2 because this includes this and the command
+                buffer.writeBytes(pixelCommandBuffer.asByteArray())
             }
 
             // This sprite is JOEVER
