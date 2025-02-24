@@ -54,6 +54,8 @@ Unsupported IFF chunks are parsed as `UnknownChunk` and are written to the IFF f
 * SimTech says that `SPR#` is used for floors, but that's not the case, all floors use `SPR2`!
 * What the transparent pixel index in `SPR2` actually does? Because even if you create a pure black floor that only has one color in the palette, and you set the "transparent color index" to 0, it still renders fine in game and in HomeCrafter.
   * Maybe this is only used for objects?
+* The Sims Online's FAR3 archive are weird... `packingslips.dat` files don't seem to have any name?!
+* It looks like floors in The Sims Complete Collection (not in HomeCrafter, heck, not even in The Sims Legacy Collection!) HATES SPR2 that uses any pixel command except 0x06 and 0x03
 
 ### Reading SPR# Images and Converting
 

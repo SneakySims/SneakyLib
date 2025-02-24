@@ -150,8 +150,8 @@ class SPR2ChunkData(
                                     0x01 -> {
                                         // Code one has two bytes of data per pixel, the depth and the palette color index.
                                         repeat(pixelCount) {
-                                            val depth = byteBuffer.readUByte()
-                                            val paletteColorIndex = byteBuffer.readUByte()
+                                            val depth = section.readUByte()
+                                            val paletteColorIndex = section.readUByte()
 
                                             imageDataRow[imageDataIndex++] = SPR2Utils.packPixelData(paletteColorIndex, 255u, depth)
                                         }
@@ -272,18 +272,26 @@ class SPR2ChunkData(
                 // We want to write palette color indexes
                 // The header is the command + the amount of pixels in this row (so, if we are using command 0x02 with 8 pixels, that would be 8 * 3 bytes, but the amount
                 // in the header would still be 8)
-                pixelCommandBuffer.writeUShortLe(SPR2Utils.packSectionHeader(0x02, row.size))
-                for (packedData in row) {
-                    // TODO: We need to support other kinds of commands (like only palette index, that sort of thing)
-                    val (paletteIndex, alphaBlending, depthBuffer) = SPR2Utils.unpackPixelData(packedData)
-                    pixelCommandBuffer.writeUByte(depthBuffer)
-                    pixelCommandBuffer.writeUByte(paletteIndex)
-                    pixelCommandBuffer.writeUByte(alphaBlending)
-                }
 
-                val isOdd = row.size % 2 == 1
-                if (isOdd) {
-                    pixelCommandBuffer.writeUByte(176u) // Padding if odd
+                // TODO: TEST THIS IN THE SIMS COMPLETE COLLECTION EVERY TIME YOU CHANGE THIS CODE
+                // It looks like Complete Collection is way pickier about what you are doing compared to Legacy Collection or even HomeCrafter
+                // When I was trying to use the 0x02 command (depth buffer + palette + alpha) the floor was completely transparent in Complete Collection!?!
+                // It looks like floors in The Sims Complete Collection (not in HomeCrafter, heck, not even in The Sims Legacy Collection!) HATE SPR2 that uses any pixel command except 0x06 and 0x03
+                // So this is very wonky, but it is what it is
+
+                // TODO: Create "SPR2 encoder options"
+                for (packedData in row) {
+                    val pixelData = SPR2Utils.unpackPixelData(packedData)
+
+                    if (pixelData.alphaBlending == 0u.toUByte()) {
+                        pixelCommandBuffer.writeUShortLe(SPR2Utils.packSectionHeader(0x03, 1))
+                    } else {
+                        pixelCommandBuffer.writeUShortLe(SPR2Utils.packSectionHeader(0x06, 1))
+                        pixelCommandBuffer.writeUByte(pixelData.paletteIndex)
+
+                        // It is always odd
+                        pixelCommandBuffer.writeUByte(176u) // Padding if odd
+                    }
                 }
 
                 // Row Header

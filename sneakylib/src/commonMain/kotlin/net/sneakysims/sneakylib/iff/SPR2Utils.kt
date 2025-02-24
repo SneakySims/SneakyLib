@@ -7,12 +7,15 @@ object SPR2Utils {
                 (depthBuffer.toInt() and 0xFF)
     }
 
-    fun unpackPixelData(packedInt: Int): Triple<UByte, UByte, UByte> {
+    fun unpackPixelData(packedInt: Int): PixelData {
         val paletteIndex = (packedInt shr 16 and 0xFF).toUByte()
         val alphaBlending = (packedInt shr 8 and 0xFF).toUByte()
         val depthBuffer = (packedInt and 0xFF).toUByte()
-        return Triple(paletteIndex, alphaBlending, depthBuffer)
+        return PixelData(paletteIndex, alphaBlending, depthBuffer)
     }
+
+    // oh but using a class for each pixel is going to be wasteful - shut the fuck up this gets confusing as hell if we don't use this
+    data class PixelData(val paletteIndex: UByte, val alphaBlending: UByte, val depthBuffer: UByte)
 
     /**
      * Unpacks the command and count from a SPR2 section header
