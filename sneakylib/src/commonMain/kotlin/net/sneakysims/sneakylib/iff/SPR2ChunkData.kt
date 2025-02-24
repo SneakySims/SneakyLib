@@ -282,34 +282,49 @@ class SPR2ChunkData(
                 // It looks like floors in The Sims Complete Collection (not in HomeCrafter, heck, not even in The Sims Legacy Collection!) HATE SPR2 that uses any pixel command except 0x06 and 0x03
                 // So this is very wonky, but it is what it is
 
+                var activeCommand: SPR2EncoderCommand? = null
+
                 // TODO: Create "SPR2 encoder options"
                 for (packedData in row) {
                     val pixelData = SPR2Utils.unpackPixelData(packedData)
 
                     if (pixelData.alphaBlending == 0u.toUByte()) {
-                        pixelCommandBuffer.writeUShortLe(SPR2Utils.packSectionHeader(0x03, 1))
+                        if (activeCommand is SPR2EncoderCommand.FillWithBackground) {
+                            activeCommand.count++
+                        } else {
+                            activeCommand?.write(pixelCommandBuffer)
+                            activeCommand = SPR2EncoderCommand.FillWithBackground(1)
+                        }
                     } else {
                         if (sprite.flags == 1.toShort()) {
-                            pixelCommandBuffer.writeUShortLe(SPR2Utils.packSectionHeader(0x06, 1))
-                            pixelCommandBuffer.writeUByte(pixelData.paletteIndex)
-
-                            // It is always odd
-                            pixelCommandBuffer.writeUByte(176u) // Padding if odd
+                            if (activeCommand is SPR2EncoderCommand.SetByPaletteIndex) {
+                                activeCommand.pixels.add(pixelData)
+                            } else {
+                                activeCommand?.write(pixelCommandBuffer)
+                                activeCommand = SPR2EncoderCommand.SetByPaletteIndex(mutableListOf(pixelData))
+                            }
                         } else if (sprite.flags == 3.toShort()) {
-                            pixelCommandBuffer.writeUShortLe(SPR2Utils.packSectionHeader(0x01, 1))
-                            pixelCommandBuffer.writeUByte(pixelData.depthBuffer)
-                            pixelCommandBuffer.writeUByte(pixelData.paletteIndex)
+                            if (activeCommand is SPR2EncoderCommand.SetByPaletteIndexAndDepthBuffer) {
+                                activeCommand.pixels.add(pixelData)
+                            } else {
+                                activeCommand?.write(pixelCommandBuffer)
+                                activeCommand = SPR2EncoderCommand.SetByPaletteIndexAndDepthBuffer(mutableListOf(pixelData))
+                            }
                         } else if (sprite.flags == 7.toShort()) {
-                            pixelCommandBuffer.writeUShortLe(SPR2Utils.packSectionHeader(0x02, 1))
-                            pixelCommandBuffer.writeUByte(pixelData.depthBuffer)
-                            pixelCommandBuffer.writeUByte(pixelData.paletteIndex)
-                            pixelCommandBuffer.writeUByte(pixelData.alphaBlending)
-
-                            // It is always odd
-                            pixelCommandBuffer.writeUByte(176u) // Padding if odd
+                            if (activeCommand is SPR2EncoderCommand.SetByPaletteIndexAndDepthBufferAndAlpha) {
+                                activeCommand.pixels.add(pixelData)
+                            } else {
+                                activeCommand?.write(pixelCommandBuffer)
+                                activeCommand = SPR2EncoderCommand.SetByPaletteIndexAndDepthBufferAndAlpha(mutableListOf(pixelData))
+                            }
                         }
                     }
                 }
+
+                if (activeCommand == null)
+                    error("Active Pixel Command is null! Bug?")
+
+                activeCommand.write(pixelCommandBuffer)
 
                 // Row Header
                 buffer.writeUShortLe(SPR2Utils.packSectionHeader(0x00, pixelCommandBuffer.bytes.size + 2)) // Section size - We do +2 because this includes this and the command
@@ -339,5 +354,54 @@ class SPR2ChunkData(
         }
 
         return buffer.asByteArray()
+    }
+
+    sealed class SPR2EncoderCommand {
+        abstract fun write(writer: ByteArrayWriter)
+
+        data class FillWithBackground(var count: Int) : SPR2EncoderCommand() {
+            override fun write(writer: ByteArrayWriter) {
+                writer.writeUShortLe(SPR2Utils.packSectionHeader(0x03, this.count))
+            }
+        }
+
+        data class SetByPaletteIndex(val pixels: MutableList<SPR2Utils.PixelData>) : SPR2EncoderCommand() {
+            override fun write(writer: ByteArrayWriter) {
+                writer.writeUShortLe(SPR2Utils.packSectionHeader(0x06, this.pixels.size))
+
+                for (pixel in pixels) {
+                    writer.writeUByte(pixel.paletteIndex)
+                }
+
+                if (pixels.size % 2 == 1)
+                    writer.writeUByte(176u) // Padding if odd
+            }
+        }
+
+        data class SetByPaletteIndexAndDepthBuffer(val pixels: MutableList<SPR2Utils.PixelData>) : SPR2EncoderCommand() {
+            override fun write(writer: ByteArrayWriter) {
+                writer.writeUShortLe(SPR2Utils.packSectionHeader(0x01, this.pixels.size))
+
+                for (pixel in pixels) {
+                    writer.writeUByte(pixel.depthBuffer)
+                    writer.writeUByte(pixel.paletteIndex)
+                }
+            }
+        }
+
+        data class SetByPaletteIndexAndDepthBufferAndAlpha(val pixels: MutableList<SPR2Utils.PixelData>) : SPR2EncoderCommand() {
+            override fun write(writer: ByteArrayWriter) {
+                writer.writeUShortLe(SPR2Utils.packSectionHeader(0x02, this.pixels.size))
+
+                for (pixel in pixels) {
+                    writer.writeUByte(pixel.depthBuffer)
+                    writer.writeUByte(pixel.paletteIndex)
+                    writer.writeUByte(pixel.alphaBlending)
+                }
+
+                if (pixels.size % 2 == 1)
+                    writer.writeUByte(176u) // Padding if odd
+            }
+        }
     }
 }
