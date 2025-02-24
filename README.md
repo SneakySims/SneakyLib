@@ -41,12 +41,14 @@ Unsupported IFF chunks are parsed as `UnknownChunk` and are written to the IFF f
 * The lib original name was "SimsLib", but I've decided to change to "SneakyLib" to avoid confusion with FreeSO's "SimsLib" and SimTech's "SimLib"
 * The road lines floor tiles are special: They rotate WITH the camera, and this seems to be hardcoded in the game, the sprites in the world swap automatically depending on your rotation.
     * I think that they hardcoded on the engine itself, because these are the only floor types that have this behavior, even tho there are other floor types in the game (even on expansion packs!) that would be better if they had proper rotations.
+    * FreeSO/Simitone always pins the floor texture to face a certain direction, probably to avoid weirdness with the 3D camera.
 * The "Catalog" BMP files in the `floors.iff` seems to be unused, you can delete them from the game and the game still renders the catalog sprites correctly.
 * The sound of the floors is controlled by the chunk name of the first (far distance) floor, example:
     * Soft Sound: `SR11GFFB00`
     * Medium Sound: `MR11GFFB00`
     * Hard Sound: `HR11GFFB00`
     * These values were checked by generating multiple floors in Maxis' HomeCrafter and comparing the differences between the floors.
+    * There also seem to be a `C` (concrete?) sound, which is used by the street and road floors (in `floors.iff`, it is the `SPR2` 9 to 14), however the sound for these floors seems to be identical to the "Medium Sound".
     * It is unknown what the other values mean.
 * The game automatically replaces missing wall/floor strings with default text from `Build.iff`'s `PluginWall` and `PluginFloor`
 * SimTech says that `SPR#` is used for floors, but that's not the case, all floors use `SPR2`!
