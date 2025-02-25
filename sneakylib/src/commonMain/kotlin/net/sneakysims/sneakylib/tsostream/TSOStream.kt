@@ -1,6 +1,6 @@
 package net.sneakysims.sneakylib.tsostream
 
-import net.sneakysims.sneakylib.refpack.Decompresser
+import net.sneakysims.sneakylib.refpack.RefPack
 import net.sneakysims.sneakylib.utils.BinaryUtils
 import net.sneakysims.sneakylib.utils.ByteArrayReader
 
@@ -34,7 +34,7 @@ class TSOStream {
                 println("Compressed data size: $compressedDataSize -> $compressedDataSizeAgain")
 
                 println(reader.byteArray.size)
-                println("compressed: ${compressedDataSize}")
+                println("Compressed: ${compressedDataSize}")
 
                 val reader = ByteArrayReader(reader.readBytes(compressedDataSize.toInt() - 4))
 
@@ -58,12 +58,7 @@ class TSOStream {
                 if (decompressedDataSize != decompressedSize.toUInt())
                     error("Mismatch between the stream header decompressed data size and the RefPack decompressed data size! Something went wrong during the decoding process! Stream Size: $decompressedDataSize RefPack Size: $decompressedSize")
 
-                val decompresser = Decompresser()
-                decompresser.setDecompressedSize(compressedDataSize.toLong())
-                decompresser.setDecompressedSize(decompressedSize.toLong())
-
-                // -4 because of the header
-                return decompresser.decompress(reader.readBytes(reader.remaining))
+                return RefPack.decompress(reader.readBytes(reader.remaining), decompressedSize)
                 // return RefPack.decompress(reader.readBytes(compressedDataSize.toInt() - 4), decompressedDataSize)
                 // return reader.readBytes(compressedDataSize.toInt() - 4)
             }
