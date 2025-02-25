@@ -94,3 +94,10 @@ implementation("net.sneakysims.sneakylib:sneakylib:0.0.0-ShortCommitHash")
 ```
 
 The `ShortCommitHash` is the short commit hash of the version that you want to use.
+
+## References
+
+* **Sim Tech's The Sims™ Technical Aspects:** https://web.archive.org/web/20220410061910/http://simtech.sourceforge.net/tech/index.html
+* **Niotso Wiki:** http://wiki.niotso.org/Main_Page
+* **FreeSO's SimsLib:** https://github.com/riperiperi/FreeSO/tree/master/Other/tools/SimsLib
+* **TS1 Blender IO:** https://github.com/mixiate/ts1-blender-io
