@@ -14,32 +14,30 @@ object FloorMaker {
     ): IFF {
         val iff = IFF.empty()
 
-        iff.chunks.add(
-            IFFChunk(
-                IFFChunk.STR_CHUNK_CODE,
-                0,
-                // Why does it need to be 16?
-                // IFF Pencil, and the game, only works if this is 16
-                16,
-                ByteArray(64),
-                STRChunkData(
-                    STRChunkData.StringFormat.StringFormatFDFF(
-                        mutableListOf(
-                            STRChunkData.StringFormat.StringFormatFDFF.SimsString(
-                                net.sneakysims.sneakylib.sims.TheSimsLanguage.getLanguageById(1),
-                                name ?: "",
-                                "!"
-                            ),
-                            STRChunkData.StringFormat.StringFormatFDFF.SimsString(
-                                net.sneakysims.sneakylib.sims.TheSimsLanguage.getLanguageById(1),
-                                (price ?: 1).toString(),
-                                "!"
-                            ),
-                            STRChunkData.StringFormat.StringFormatFDFF.SimsString(
-                                net.sneakysims.sneakylib.sims.TheSimsLanguage.getLanguageById(1),
-                                description ?: "",
-                                "!"
-                            )
+        iff.addChunk(
+            IFFChunk.STR_CHUNK_CODE,
+            0,
+            // Why does it need to be 16?
+            // IFF Pencil, and the game, only works if this is 16
+            16,
+            null,
+            STRChunkData(
+                STRChunkData.StringFormat.StringFormatFDFF(
+                    mutableListOf(
+                        STRChunkData.StringFormat.StringFormatFDFF.SimsString(
+                            net.sneakysims.sneakylib.sims.TheSimsLanguage.getLanguageById(1),
+                            name,
+                            "!"
+                        ),
+                        STRChunkData.StringFormat.StringFormatFDFF.SimsString(
+                            net.sneakysims.sneakylib.sims.TheSimsLanguage.getLanguageById(1),
+                            price.toString(),
+                            "!"
+                        ),
+                        STRChunkData.StringFormat.StringFormatFDFF.SimsString(
+                            net.sneakysims.sneakylib.sims.TheSimsLanguage.getLanguageById(1),
+                            description,
+                            "!"
                         )
                     )
                 )
@@ -48,65 +46,57 @@ object FloorMaker {
 
         val colors = PaletteCreator.extractColors(sprite)
 
-        iff.chunks.add(
-            IFFChunk(
-                IFFChunk.PALT_CHUNK_CODE,
-                1537,
-                0,
-                ByteArray(64),
-                PALTChunkData(
-                    1,
-                    0,
-                    0,
-                    palette.map { Color(it.red, it.green, it.blue) }
-                )
-            )
-        )
-
-        iff.chunks.add(
-            IFFChunk(
-                IFFChunk.SPR2_CHUNK_CODE,
+        iff.addChunk(
+            IFFChunk.PALT_CHUNK_CODE,
+            1537,
+            0,
+            null,
+            PALTChunkData(
                 1,
-                16,
-                IFFChunkUtils.createChunkName("${stepSound.chunkPrefix}R3AG3AB4E"),
-                SPR2ChunkData(
-                    1000,
-                    1537,
-                    mutableListOf(
-                        convertToSPR2Sprite(sprite, 31, 16, palette)
-                    )
+                0,
+                0,
+                palette.map { Color(it.red, it.green, it.blue) }
+            )
+        )
+
+        iff.addChunk(
+            IFFChunk.SPR2_CHUNK_CODE,
+            1,
+            16,
+            "${stepSound.chunkPrefix}R3AG3AB4E",
+            SPR2ChunkData(
+                1000,
+                1537,
+                mutableListOf(
+                    convertToSPR2Sprite(sprite, 31, 16, palette)
                 )
             )
         )
 
-        iff.chunks.add(
-            IFFChunk(
-                IFFChunk.SPR2_CHUNK_CODE,
-                257,
-                16,
-                ByteArray(64),
-                SPR2ChunkData(
-                    1000,
-                    1537,
-                    mutableListOf(
-                        convertToSPR2Sprite(sprite, 63, 32, palette)
-                    )
+        iff.addChunk(
+            IFFChunk.SPR2_CHUNK_CODE,
+            257,
+            16,
+            null,
+            SPR2ChunkData(
+                1000,
+                1537,
+                mutableListOf(
+                    convertToSPR2Sprite(sprite, 63, 32, palette)
                 )
             )
         )
 
-        iff.chunks.add(
-            IFFChunk(
-                IFFChunk.SPR2_CHUNK_CODE,
-                513,
-                16,
-                ByteArray(64),
-                SPR2ChunkData(
-                    1000,
-                    1537,
-                    mutableListOf(
-                        convertToSPR2Sprite(sprite, 127, 64, palette)
-                    )
+        iff.addChunk(
+            IFFChunk.SPR2_CHUNK_CODE,
+            513,
+            16,
+            null,
+            SPR2ChunkData(
+                1000,
+                1537,
+                mutableListOf(
+                    convertToSPR2Sprite(sprite, 127, 64, palette)
                 )
             )
         )

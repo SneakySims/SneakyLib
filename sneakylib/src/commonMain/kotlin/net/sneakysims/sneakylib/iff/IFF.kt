@@ -49,27 +49,41 @@ class IFF(val chunks: MutableList<IFFChunk>) {
                 // Also because decoding it as a string seems to be lossy and causes the IFF file to not match!
                 val nameStringAsBytes = reader.readBytes(64)
 
+                // Read the chunk!
                 val diff = reader.position - startingPosition
                 val data = reader.readBytes(size - diff)
 
-                // Read the chunk!
-                val chunkData = when (typeCode) {
-                    IFFChunk.PALT_CHUNK_CODE -> PALTChunkData.read(data)
-                    IFFChunk.STR_CHUNK_CODE -> STRChunkData.read(data)
-                    IFFChunk.SPR_CHUNK_CODE -> SPRChunkData.read(data)
-                    IFFChunk.SPR2_CHUNK_CODE -> SPR2ChunkData.read(data)
-
-                    // If we don't know how to parse the chunk, just read as an unknown chunk (which will cause it to be written as-is)
-                    else -> UnknownChunkData(data)
-                }
-
-                val chunk = IFFChunk(typeCode, id, flags, nameStringAsBytes, chunkData)
+                val chunk = IFFChunk(typeCode, id, flags, nameStringAsBytes, data)
 
                 chunks.add(chunk)
             }
 
             return IFF(chunks)
         }
+    }
+
+    /**
+     * Adds a chunk to this IFF file
+     *
+     * @param code  the chunk code (example: `SPR2`)
+     * @param id    the ID of the chunk, IDs should be unique for each code
+     * @param flags the chunk flag, currently it is unknown what are the flags meanings,
+     *  the game uses 0 and 16 as flags and if you don't use the correct one the chunk
+     *  isn't loaded by the game
+     * @param name  the name of the chunk, can be null, some attributes in the game are
+     *  controlled by the chunk name, like floor step sounds
+     * @param data  the data of the chunk
+     */
+    fun addChunk(code: String, id: Short, flags: Short, name: String?, data: IFFChunkData) {
+        this.chunks.add(
+            IFFChunk(
+                code,
+                id,
+                flags,
+                name?.let { IFFChunkUtils.createChunkName(it) } ?: IFFChunkUtils.EMPTY_CHUNK_NAME,
+                data.write()
+            )
+        )
     }
 
     fun write(): ByteArray {
@@ -89,22 +103,14 @@ class IFF(val chunks: MutableList<IFFChunk>) {
             }
 
             if (chunk.code != "rsmp") {
-                val data = when (chunk.data) {
-                    is PALTChunkData -> chunk.data.write()
-                    is STRChunkData -> chunk.data.write()
-                    is SPRChunkData -> chunk.data.write()
-                    is SPR2ChunkData -> chunk.data.write()
-                    is UnknownChunkData -> chunk.data.data
-                }
-
                 buffer.writeBytes(chunk.code.encodeToByteArray())
                 // data size + code size + this + chunk id + chunk flags + chunk name
-                buffer.writeInt(data.size + 4 + 4 + 2 + 2 + 64)
+                buffer.writeInt(chunk.data.size + 4 + 4 + 2 + 2 + 64)
                 buffer.writeShort(chunk.id)
                 buffer.writeShort(chunk.flags)
                 buffer.writeBytes(chunk.name)
 
-                buffer.writeBytes(data)
+                buffer.writeBytes(chunk.data)
             }
         }
 

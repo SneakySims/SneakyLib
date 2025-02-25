@@ -12,32 +12,30 @@ fun main() {
     val iff = IFF.empty()
 
     // iff.chunks.addAll(originalIff.chunks.filter { it.code == "STR#" })
-    iff.chunks.add(
-        IFFChunk(
-            IFFChunk.STR_CHUNK_CODE,
-            0,
-            // Why does it need to be 16?
-            // IFF Pencil, and the game, only works if this is 16
-            16,
-            ByteArray(64),
-            STRChunkData(
-                STRChunkData.StringFormat.StringFormatFDFF(
-                    mutableListOf(
-                        STRChunkData.StringFormat.StringFormatFDFF.SimsString(
-                            net.sneakysims.sneakylib.sims.TheSimsLanguage.getLanguageById(1),
-                            "Loritta is so cute!!",
-                            "!"
-                        ),
-                        STRChunkData.StringFormat.StringFormatFDFF.SimsString(
-                            net.sneakysims.sneakylib.sims.TheSimsLanguage.getLanguageById(1),
-                            "1",
-                            "!"
-                        ),
-                        STRChunkData.StringFormat.StringFormatFDFF.SimsString(
-                            net.sneakysims.sneakylib.sims.TheSimsLanguage.getLanguageById(1),
-                            "hewwo",
-                            "!"
-                        )
+    iff.addChunk(
+        IFFChunk.STR_CHUNK_CODE,
+        0,
+        // Why does it need to be 16?
+        // IFF Pencil, and the game, only works if this is 16
+        16,
+        null,
+        STRChunkData(
+            STRChunkData.StringFormat.StringFormatFDFF(
+                mutableListOf(
+                    STRChunkData.StringFormat.StringFormatFDFF.SimsString(
+                        net.sneakysims.sneakylib.sims.TheSimsLanguage.getLanguageById(1),
+                        "Loritta is so cute!!",
+                        "!"
+                    ),
+                    STRChunkData.StringFormat.StringFormatFDFF.SimsString(
+                        net.sneakysims.sneakylib.sims.TheSimsLanguage.getLanguageById(1),
+                        "1",
+                        "!"
+                    ),
+                    STRChunkData.StringFormat.StringFormatFDFF.SimsString(
+                        net.sneakysims.sneakylib.sims.TheSimsLanguage.getLanguageById(1),
+                        "hewwo",
+                        "!"
                     )
                 )
             )
@@ -48,18 +46,16 @@ fun main() {
     val palette = PaletteCreator.kMeansQuantization(colors, 256)
     println("Palette Size is ${palette.size}")
 
-    iff.chunks.add(
-        IFFChunk(
-            IFFChunk.PALT_CHUNK_CODE,
-            1537,
+    iff.addChunk(
+        IFFChunk.PALT_CHUNK_CODE,
+        1537,
+        0,
+        null,
+        PALTChunkData(
+            1,
             0,
-            ByteArray(64),
-            PALTChunkData(
-                1,
-                0,
-                0,
-                palette.map { Color(it.red, it.green, it.blue) }
-            )
+            0,
+            palette.map { Color(it.red, it.green, it.blue) }
         )
     )
 
@@ -107,50 +103,44 @@ fun main() {
         )
     }
 
-    iff.chunks.add(
-        IFFChunk(
-            IFFChunk.SPR2_CHUNK_CODE,
-            1,
-            16,
-            IFFChunkUtils.createChunkName("${FloorUtils.SOFT_FLOOR_SOUND_CHUNK_NAME}R3AG3AB4E"),
-            SPR2ChunkData(
-                1000,
-                1537,
-                mutableListOf(
-                    convertToSPR2Sprite(floor, 31, 16)
-                )
+    iff.addChunk(
+        IFFChunk.SPR2_CHUNK_CODE,
+        1,
+        16,
+        "${FloorUtils.SOFT_FLOOR_SOUND_CHUNK_NAME}R3AG3AB4E",
+        SPR2ChunkData(
+            1000,
+            1537,
+            mutableListOf(
+                convertToSPR2Sprite(floor, 31, 16)
             )
         )
     )
 
-    iff.chunks.add(
-        IFFChunk(
-            IFFChunk.SPR2_CHUNK_CODE,
-            257,
-            16,
-            ByteArray(64),
-            SPR2ChunkData(
-                1000,
-                1537,
-                mutableListOf(
-                    convertToSPR2Sprite(floor, 63, 32)
-                )
+    iff.addChunk(
+        IFFChunk.SPR2_CHUNK_CODE,
+        257,
+        16,
+        null,
+        SPR2ChunkData(
+            1000,
+            1537,
+            mutableListOf(
+                convertToSPR2Sprite(floor, 63, 32)
             )
         )
     )
 
-    iff.chunks.add(
-        IFFChunk(
-            IFFChunk.SPR2_CHUNK_CODE,
-            513,
-            16,
-            ByteArray(64),
-            SPR2ChunkData(
-                1000,
-                1537,
-                mutableListOf(
-                    convertToSPR2Sprite(floor, 127, 64)
-                )
+    iff.addChunk(
+        IFFChunk.SPR2_CHUNK_CODE,
+        513,
+        16,
+        null,
+        SPR2ChunkData(
+            1000,
+            1537,
+            mutableListOf(
+                convertToSPR2Sprite(floor, 127, 64)
             )
         )
     )

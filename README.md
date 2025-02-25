@@ -27,7 +27,7 @@ Another good example is the `:floormaker-common` and `:floormaker-cli` modules.
 | `SPR#` | Partial | Partial | The decoder does not support big endian sprites. The encoder is not optimized yet, does not support transparent pixels mixed with non-transparent pixels in the same row.
 | `SPR2` | Partial | Partial | The decoder and encoder still needs to be tested more because it has only been tested with floors, but all channels are able to be extracted and reencoded correctly.
 
-Unsupported IFF chunks are parsed as `UnknownChunk` and are written to the IFF file as-is.
+By the default the IFF reader does not attempt to decode any of the chunk data, you can decode them by calling `chunk.decodeAs[ChunkName]()` (example: `decodeAsSPR2()`), this way you can selectively choose which chunks you want to read and edit and which ones you want to keep as-is.
 
 ### Important Things to Note
 

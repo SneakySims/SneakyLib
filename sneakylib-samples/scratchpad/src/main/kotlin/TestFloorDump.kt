@@ -1,7 +1,5 @@
 import net.sneakysims.sneakylib.iff.IFF
 import net.sneakysims.sneakylib.iff.IFFChunk
-import net.sneakysims.sneakylib.iff.IFFChunkData
-import net.sneakysims.sneakylib.iff.SPR2ChunkData
 import net.sneakysims.sneakylib.utils.decodeToStringUsingWindows1252
 import java.io.File
 
@@ -17,16 +15,14 @@ fun main() {
             println("Flags: ${it.flags}")
             println("Name: ${it.name.decodeToStringUsingWindows1252()}")
 
-            val data = it.data
-            if (data is SPR2ChunkData) {
-                println("Version: ${data.version}")
+            val data = it.decodeDataAsSPR2()
+            println("Version: ${data.version}")
 
-                for (spr in data.sprites) {
-                    println(spr.overridenPaletteId)
-                    println(spr.unknown)
-                    println(spr.flags)
-                    println(spr.transparentPixelPaletteIndexId)
-                }
+            for (spr in data.sprites) {
+                println(spr.overridenPaletteId)
+                println(spr.unknown)
+                println(spr.flags)
+                println(spr.transparentPixelPaletteIndexId)
             }
         }
 }

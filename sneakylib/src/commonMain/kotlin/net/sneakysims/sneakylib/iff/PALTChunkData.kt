@@ -38,7 +38,7 @@ class PALTChunkData(
         }
     }
 
-    fun write(): ByteArray {
+    override fun write(): ByteArray {
         val buffer = ByteArrayWriter()
 
         buffer.writeIntLe(this.unknown)

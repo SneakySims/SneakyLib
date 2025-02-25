@@ -15,11 +15,11 @@ fun main() {
 
     if (false) {
         fun dumpSPR(iff: IFF, prefix: String) {
-            for (chunk in iff.chunks.filter { it.code == net.sneakysims.sneakylib.iff.IFFChunk.SPR_CHUNK_CODE }) {
+            for (chunk in iff.chunks.filter { it.code == IFFChunk.SPR_CHUNK_CODE }) {
                 // Also must be 16?
                 println("Chunk Flags: ${chunk.flags}")
-                val spr = chunk.data as SPRChunkData
-                val palt = iff.chunks.first { it.id == spr.paletteId.toShort() }.data as PALTChunkData
+                val spr = chunk.decodeDataAsSPR()
+                val palt = iff.chunks.first { it.id == spr.paletteId.toShort() }.decodeDataAsPALT()
 
                 for ((index, sprite) in spr.sprites.withIndex()) {
                     val image = BufferedImage(sprite.imageData.width.toInt(), sprite.imageData.height.toInt(), BufferedImage.TYPE_INT_ARGB)
@@ -46,32 +46,30 @@ fun main() {
         return
     }
     // iff.chunks.addAll(originalIff.chunks.filter { it.code == "STR#" })
-    iff.chunks.add(
-        net.sneakysims.sneakylib.iff.IFFChunk(
-            net.sneakysims.sneakylib.iff.IFFChunk.STR_CHUNK_CODE,
-            0,
-            // Why does it need to be 16?
-            // IFF Pencil, and the game, only works if this is 16
-            16,
-            ByteArray(64),
-            STRChunkData(
-                STRChunkData.StringFormat.StringFormatFDFF(
-                    mutableListOf(
-                        STRChunkData.StringFormat.StringFormatFDFF.SimsString(
-                            net.sneakysims.sneakylib.sims.TheSimsLanguage.getLanguageById(1),
-                            "Loritta is so cute!!",
-                            "!"
-                        ),
-                        STRChunkData.StringFormat.StringFormatFDFF.SimsString(
-                            net.sneakysims.sneakylib.sims.TheSimsLanguage.getLanguageById(1),
-                            "1",
-                            "!"
-                        ),
-                        STRChunkData.StringFormat.StringFormatFDFF.SimsString(
-                            net.sneakysims.sneakylib.sims.TheSimsLanguage.getLanguageById(1),
-                            "hewwo",
-                            "!"
-                        )
+    iff.addChunk(
+        IFFChunk.STR_CHUNK_CODE,
+        0,
+        // Why does it need to be 16?
+        // IFF Pencil, and the game, only works if this is 16
+        16,
+        null,
+        STRChunkData(
+            STRChunkData.StringFormat.StringFormatFDFF(
+                mutableListOf(
+                    STRChunkData.StringFormat.StringFormatFDFF.SimsString(
+                        TheSimsLanguage.getLanguageById(1),
+                        "Loritta is so cute!!",
+                        "!"
+                    ),
+                    STRChunkData.StringFormat.StringFormatFDFF.SimsString(
+                        TheSimsLanguage.getLanguageById(1),
+                        "1",
+                        "!"
+                    ),
+                    STRChunkData.StringFormat.StringFormatFDFF.SimsString(
+                        TheSimsLanguage.getLanguageById(1),
+                        "hewwo",
+                        "!"
                     )
                 )
             )
@@ -88,18 +86,16 @@ fun main() {
     val palette = kMeansQuantization(colors, 256)
     println("Palette Size is ${palette.size}")
 
-    iff.chunks.add(
-        net.sneakysims.sneakylib.iff.IFFChunk(
-            net.sneakysims.sneakylib.iff.IFFChunk.PALT_CHUNK_CODE,
-            1537,
+    iff.addChunk(
+        IFFChunk.PALT_CHUNK_CODE,
+        1537,
+        0,
+        null,
+        PALTChunkData(
+            1,
             0,
-            ByteArray(64),
-            PALTChunkData(
-                1,
-                0,
-                0,
-                palette.map { Color(it.red, it.green, it.blue) }
-            )
+            0,
+            palette.map { Color(it.red, it.green, it.blue) }
         )
     )
 
@@ -132,59 +128,53 @@ fun main() {
     // Walls requires a SPR# chunk, if not the wall will not load
     // The SPR# may be wonky or corrupt, but it MUST exist
 
-    iff.chunks.add(
-        net.sneakysims.sneakylib.iff.IFFChunk(
-            net.sneakysims.sneakylib.iff.IFFChunk.SPR_CHUNK_CODE,
-            1,
-            16,
-            ByteArray(64),
-            SPRChunkData(
-                505,
-                1537,
-                mutableListOf(
-                    convertToSPRSprite(sprite0, 16, 67),
-                    convertToSPRSprite(sprite1, 16, 68),
-                    convertToSPRSprite(sprite2, 32, 60),
-                    convertToSPRSprite(sprite3, 4, 58)
-                )
+    iff.addChunk(
+        IFFChunk.SPR_CHUNK_CODE,
+        1,
+        16,
+        null,
+        SPRChunkData(
+            505,
+            1537,
+            mutableListOf(
+                convertToSPRSprite(sprite0, 16, 67),
+                convertToSPRSprite(sprite1, 16, 68),
+                convertToSPRSprite(sprite2, 32, 60),
+                convertToSPRSprite(sprite3, 4, 58)
             )
         )
     )
 
-    iff.chunks.add(
-        net.sneakysims.sneakylib.iff.IFFChunk(
-            net.sneakysims.sneakylib.iff.IFFChunk.SPR_CHUNK_CODE,
-            1793,
-            16,
-            ByteArray(64),
-            SPRChunkData(
-                505,
-                1537,
-                mutableListOf(
-                    convertToSPRSprite(sprite0, 32, 135),
-                    convertToSPRSprite(sprite1, 32, 136),
-                    convertToSPRSprite(sprite2, 64, 120),
-                    convertToSPRSprite(sprite3, 8, 116)
-                )
+    iff.addChunk(
+        IFFChunk.SPR_CHUNK_CODE,
+        1793,
+        16,
+        null,
+        SPRChunkData(
+            505,
+            1537,
+            mutableListOf(
+                convertToSPRSprite(sprite0, 32, 135),
+                convertToSPRSprite(sprite1, 32, 136),
+                convertToSPRSprite(sprite2, 64, 120),
+                convertToSPRSprite(sprite3, 8, 116)
             )
         )
     )
 
-    iff.chunks.add(
-        net.sneakysims.sneakylib.iff.IFFChunk(
-            net.sneakysims.sneakylib.iff.IFFChunk.SPR_CHUNK_CODE,
-            2049,
-            16,
-            ByteArray(64),
-            SPRChunkData(
-                505,
-                1537,
-                mutableListOf(
-                    convertToSPRSprite(sprite0, 64, 271),
-                    convertToSPRSprite(sprite1, 64, 272),
-                    convertToSPRSprite(sprite2, 128, 240),
-                    convertToSPRSprite(sprite3, 16, 232)
-                )
+    iff.addChunk(
+        IFFChunk.SPR_CHUNK_CODE,
+        2049,
+        16,
+        null,
+        SPRChunkData(
+            505,
+            1537,
+            mutableListOf(
+                convertToSPRSprite(sprite0, 64, 271),
+                convertToSPRSprite(sprite1, 64, 272),
+                convertToSPRSprite(sprite2, 128, 240),
+                convertToSPRSprite(sprite3, 16, 232)
             )
         )
     )

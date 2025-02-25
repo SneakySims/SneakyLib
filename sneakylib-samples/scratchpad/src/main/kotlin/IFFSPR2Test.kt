@@ -5,11 +5,11 @@ import java.io.File
 import javax.imageio.ImageIO
 
 fun main() {
-    val input = File("C:\\Program Files (x86)\\Maxis\\The Sims\\GameData\\Floors\\noise.flr")
+    val input = File("furalhacc.flr")
 
     val iff = IFF.read(input.readBytes())
 
-    dumpSPR2(iff, "noiseflr")
+    dumpSPR2(iff, "furalhacc")
     /* val iff = IFF.empty()
 
     iff.chunks.add(

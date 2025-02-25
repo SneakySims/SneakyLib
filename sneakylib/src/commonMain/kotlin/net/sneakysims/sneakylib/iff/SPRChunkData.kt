@@ -195,7 +195,7 @@ class SPRChunkData(
         }
     }
 
-    fun write(): ByteArray {
+    override fun write(): ByteArray {
         val buffer = ByteArrayWriter()
 
         buffer.writeIntLe(this.version) // 0..3

@@ -55,7 +55,7 @@ class STRChunkData(val format: StringFormat) : IFFChunkData() {
         }
     }
 
-    fun write(): ByteArray {
+    override fun write(): ByteArray {
         val buffer = ByteArrayWriter()
 
         buffer.writeShortLe(format.formatId)

@@ -12,7 +12,7 @@ fun main() {
 
     return
 
-    val text = iff.chunks.filter { it.code == "STR#" }.first().data as STRChunkData
+    val text = iff.chunks.first { it.code == "STR#" }.decodeDataAsSTR()
 
     when (text.format) {
         is STRChunkData.StringFormat.StringFormatFDFF -> {
@@ -32,12 +32,9 @@ fun main() {
 
     dumpSPR(iff, "original")
 
-    iff.chunks
-        .filter {
-            it.data is PALTChunkData
-        }
+    iff.chunks.filter { it.code == IFFChunk.PALT_CHUNK_CODE }
         .forEach {
-            (it.data as PALTChunkData).entries.forEachIndexed { index, color ->
+            it.decodeDataAsPALT().entries.forEachIndexed { index, color ->
                 println("Index $index is $color")
             }
         }
@@ -51,13 +48,13 @@ fun main() {
 }
 
 fun dumpSPR(iff: IFF, prefix: String) {
-    val sprIff = iff.chunks.filter { it.code == net.sneakysims.sneakylib.iff.IFFChunk.SPR_CHUNK_CODE }
+    val sprIff = iff.chunks.filter { it.code == IFFChunk.SPR_CHUNK_CODE }
 
     for (sprChunk in sprIff) {
-        val spr = sprChunk.data as SPRChunkData
+        val spr = sprChunk.decodeDataAsSPR()
 
         for ((index, sprite) in spr.sprites.withIndex()) {
-            val palt = iff.chunks.firstOrNull { it.id == spr.paletteId.toShort() }?.data as? PALTChunkData
+            val palt = iff.chunks.firstOrNull { it.id == spr.paletteId.toShort() }?.decodeDataAsPALT()
             if (palt == null) {
                 println("Could not find palette for SPR# ${sprChunk.id}! ${spr.paletteId.toShort()}")
                 continue
