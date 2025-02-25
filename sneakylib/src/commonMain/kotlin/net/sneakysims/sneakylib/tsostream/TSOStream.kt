@@ -1,6 +1,6 @@
 package net.sneakysims.sneakylib.tsostream
 
-import net.sneakysims.sneakylib.refpack.RefPack
+import net.sneakysims.sneakylib.refpack.Decompresser
 import net.sneakysims.sneakylib.utils.BinaryUtils
 import net.sneakysims.sneakylib.utils.ByteArrayReader
 
@@ -36,10 +36,36 @@ class TSOStream {
                 println(reader.byteArray.size)
                 println("compressed: ${compressedDataSize}")
 
-                // -4 because of the header
-                RefPack.decompress(reader.readBytes(compressedDataSize.toInt() - 4), decompressedDataSize)
+                val reader = ByteArrayReader(reader.readBytes(compressedDataSize.toInt() - 4))
 
-                TODO("Compression!")
+                val flags = reader.readUByte()
+                val magicValue = reader.readUByte()
+
+                if (magicValue != 0xFB.toUByte())
+                    error("Incorrect magic value! Value: $magicValue")
+
+                // The Sims Online understands the "compressed-size-present" but it none of the game files uses it
+                // If the first bit of the flag is set, then that means that the compressed size is four bytes instead of three
+                // The Sims Online does not use it tho
+                // The size format is in big endian
+                val byte0 = reader.readByte()
+                val byte1 = reader.readByte()
+                val byte2 = reader.readByte()
+
+                val decompressedSize = BinaryUtils.combineBytesToInt(byte0, byte1, byte2)
+                println(decompressedSize)
+
+                if (decompressedDataSize != decompressedSize.toUInt())
+                    error("Mismatch between the stream header decompressed data size and the RefPack decompressed data size! Something went wrong during the decoding process! Stream Size: $decompressedDataSize RefPack Size: $decompressedSize")
+
+                val decompresser = Decompresser()
+                decompresser.setDecompressedSize(compressedDataSize.toLong())
+                decompresser.setDecompressedSize(decompressedSize.toLong())
+
+                // -4 because of the header
+                return decompresser.decompress(reader.readBytes(reader.remaining))
+                // return RefPack.decompress(reader.readBytes(compressedDataSize.toInt() - 4), decompressedDataSize)
+                // return reader.readBytes(compressedDataSize.toInt() - 4)
             }
         }
     }

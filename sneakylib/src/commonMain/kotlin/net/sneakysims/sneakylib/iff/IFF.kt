@@ -3,7 +3,7 @@ package net.sneakysims.sneakylib.iff
 import net.sneakysims.sneakylib.utils.ByteArrayReader
 import net.sneakysims.sneakylib.utils.ByteArrayWriter
 
-class IFF(val chunks: MutableList<net.sneakysims.sneakylib.iff.IFFChunk>) {
+class IFF(val chunks: MutableList<IFFChunk>) {
     companion object {
         val IFF_FILE_HEADER = "IFF FILE 2.5:TYPE FOLLOWED BY SIZE\u0000 JAMIE DOORNBOS & MAXIS 1"
 
@@ -28,7 +28,7 @@ class IFF(val chunks: MutableList<net.sneakysims.sneakylib.iff.IFFChunk>) {
 
             println("Resource Map Offset: $resourceMapOffset")
 
-            val chunks = mutableListOf<net.sneakysims.sneakylib.iff.IFFChunk>()
+            val chunks = mutableListOf<IFFChunk>()
 
             while (reader.hasRemaining()) {
                 val startingPosition = reader.position
@@ -54,16 +54,16 @@ class IFF(val chunks: MutableList<net.sneakysims.sneakylib.iff.IFFChunk>) {
 
                 // Read the chunk!
                 val chunkData = when (typeCode) {
-                    net.sneakysims.sneakylib.iff.IFFChunk.PALT_CHUNK_CODE -> PALTChunkData.read(data)
-                    net.sneakysims.sneakylib.iff.IFFChunk.STR_CHUNK_CODE -> STRChunkData.read(data)
-                    net.sneakysims.sneakylib.iff.IFFChunk.SPR_CHUNK_CODE -> SPRChunkData.read(data)
-                    net.sneakysims.sneakylib.iff.IFFChunk.SPR2_CHUNK_CODE -> SPR2ChunkData.read(data)
+                    IFFChunk.PALT_CHUNK_CODE -> PALTChunkData.read(data)
+                    IFFChunk.STR_CHUNK_CODE -> STRChunkData.read(data)
+                    IFFChunk.SPR_CHUNK_CODE -> SPRChunkData.read(data)
+                    IFFChunk.SPR2_CHUNK_CODE -> SPR2ChunkData.read(data)
 
                     // If we don't know how to parse the chunk, just read as an unknown chunk (which will cause it to be written as-is)
-                    else -> net.sneakysims.sneakylib.iff.UnknownChunkData(data)
+                    else -> UnknownChunkData(data)
                 }
 
-                val chunk = net.sneakysims.sneakylib.iff.IFFChunk(typeCode, id, flags, nameStringAsBytes, chunkData)
+                val chunk = IFFChunk(typeCode, id, flags, nameStringAsBytes, chunkData)
 
                 chunks.add(chunk)
             }
@@ -94,8 +94,7 @@ class IFF(val chunks: MutableList<net.sneakysims.sneakylib.iff.IFFChunk>) {
                     is STRChunkData -> chunk.data.write()
                     is SPRChunkData -> chunk.data.write()
                     is SPR2ChunkData -> chunk.data.write()
-                    is net.sneakysims.sneakylib.iff.UnknownChunkData -> chunk.data.data
-
+                    is UnknownChunkData -> chunk.data.data
                 }
 
                 buffer.writeBytes(chunk.code.encodeToByteArray())

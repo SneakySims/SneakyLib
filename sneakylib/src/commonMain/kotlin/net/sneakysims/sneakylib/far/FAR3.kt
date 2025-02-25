@@ -44,7 +44,7 @@ class FAR3(val files: MutableList<FAR3File>) {
                 val typeId = reader.readUIntLe()
                 val fileId = reader.readUIntLe()
                 val fileNameBytes = reader.readBytes(fileNameLength)
-                val fileName = fileNameBytes.map { it.toInt().toChar() }.toCharArray().concatToString()
+                var fileName = fileNameBytes.map { it.toInt().toChar() }.toCharArray().concatToString()
 
                 val lastManifestOffset = reader.position
                 println("decompressedFileLength: $fileLength")
