@@ -13,19 +13,19 @@ Another good example is the `:floormaker-common` and `:floormaker-cli` modules.
 ## Supported Formats
 
 ### FAR
-| Type                       | Read | Write |
-|----------------------------|------|-------|
-| `FAR 1a (The Sims 1)`      | ✅    | ✅     |
-| `FAR 1b (The Sims Online)` | ✅    | ✅     |
-| `FAR 3 (The Sims Online)`  | ❌    | ❌     |
+| Type                       | Read | Write | Notes                                                                 |
+|----------------------------|------|-------|-----------------------------------------------------------------------|
+| `FAR 1a (The Sims 1)`      | ✅    | ✅     |                                                                       |
+| `FAR 1b (The Sims Online)` | ✅    | ✅     |                                                                       |
+| `FAR 3 (The Sims Online)`  | ✅    | ❌     | Supports RefPack decompression, decompression code ported from FreeSO |
 
 ### IFF
-| Type   | Read    | Write   | Notes |
-|--------|---------|---------|-------|
-| `PALT` | ✅       | ✅       |
+| Type   | Read   | Write   | Notes |
+|--------|--------|---------|-------|
+| `PALT` | ✅      | ✅       |
 | `STR#` | Partial | Partial | Only supports the `FD FF` format 
 | `SPR#` | Partial | Partial | The decoder does not support big endian sprites. The encoder is not optimized yet, does not support transparent pixels mixed with non-transparent pixels in the same row.
-| `SPR2` | Partial | Partial | The encoder is still a bit wonky
+| `SPR2` | Partial | Partial | The decoder and encoder still needs to be tested more because it has only been tested with floors, but all channels are able to be extracted and reencoded correctly.
 
 Unsupported IFF chunks are parsed as `UnknownChunk` and are written to the IFF file as-is.
 
@@ -56,7 +56,7 @@ Unsupported IFF chunks are parsed as `UnknownChunk` and are written to the IFF f
   * Maybe this is only used for objects?
 * The Sims Online's FAR3 archive are weird... `packingslips.dat` files don't seem to have any name?!
 * It looks like floors in The Sims Complete Collection (not in HomeCrafter, heck, not even in The Sims Legacy Collection!) HATES SPR2 that uses any pixel command except 0x06 and 0x03
-
+  * I think it is because floors are encoded with the flag 1 (only color channel) and, while Legacy Collection and HomeCrafter does not care about that, Complete Collection does care about it and trips out after encountering an unexpected flag.
 ### Reading SPR# Images and Converting
 
 ```kotlin
