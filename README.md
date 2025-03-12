@@ -62,6 +62,7 @@ By the default the IFF reader does not attempt to decode any of the chunk data, 
   * **TODO:** ACTUALLY DOCUMENT THIS ^^^
 * The reason why we use `harmonymath` instead of JOML is because we want to use the lib on the browser too, which is why we haphazardly ported some of the JOML classes to Kotlin Multiplatform 
 * The SKN/CMX parser seems to work fine, it is used for [SneakySims's Website](https://sneakysims.net) for skin rendering preview
+* Port of FreeSO's RefPack decompressor to Java (made by ChatGPT which somehow worked on the first try?!?!): https://gist.github.com/MrPowerGamerBR/a1adbfe5a974bef69d8143daca22f2d5
 
 ### Reading SPR# Images and Converting
 
