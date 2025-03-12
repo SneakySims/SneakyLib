@@ -3,6 +3,7 @@ plugins {
 }
 rootProject.name = "SneakyLib"
 
+include(":harmonymath")
 include(":slippyimage")
 include(":sneakylib")
 include(":sneakylib-samples:scratchpad")

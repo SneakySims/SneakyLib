@@ -57,6 +57,12 @@ By the default the IFF reader does not attempt to decode any of the chunk data, 
 * The Sims Online's FAR3 archive are weird... `packingslips.dat` files don't seem to have any name?!
 * It looks like floors in The Sims Complete Collection (not in HomeCrafter, heck, not even in The Sims Legacy Collection!) HATES SPR2 that uses any pixel command except 0x06 and 0x03
   * I think it is because floors are encoded with the flag 1 (only color channel) and, while Legacy Collection and HomeCrafter does not care about that, Complete Collection does care about it and trips out after encountering an unexpected flag.
+* Figuring out how the game handles the SKN <-> CMX <-> BMP relation is confusing...
+  * The game uses the bitmap in the `skn` file, but it ONLY seems to use it for accessories
+  * **TODO:** ACTUALLY DOCUMENT THIS ^^^
+* The reason why we use `harmonymath` instead of JOML is because we want to use the lib on the browser too, which is why we haphazardly ported some of the JOML classes to Kotlin Multiplatform 
+* The SKN/CMX parser seems to work fine, it is used for [SneakySims's Website](https://sneakysims.net) for skin rendering preview
+
 ### Reading SPR# Images and Converting
 
 ```kotlin

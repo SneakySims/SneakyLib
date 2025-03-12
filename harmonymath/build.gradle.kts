@@ -3,7 +3,7 @@ plugins {
     id("maven-publish")
 }
 
-group = "net.sneakysims.sneakylib"
+group = "net.perfectdreams.harmony.math"
 
 repositories {
     mavenCentral()
@@ -24,23 +24,19 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(kotlin("stdlib-common"))
-                implementation(project(":slippyimage"))
-                implementation(project(":harmonymath"))
             }
         }
 
         val jsMain by getting {
             dependencies {
-                implementation(npm("iconv-lite", "0.6.3"))
-                implementation(npm("buffer", "6.0.3")) // iconv-lite needs this
-                // Not strictly required but it does have some nice extension methods
-                implementation("org.jetbrains.kotlin-wrappers:kotlin-browser:2025.2.5")
             }
         }
 
         val jvmTest by getting {
             dependencies {
                 implementation(kotlin("test"))
+                // https://mvnrepository.com/artifact/org.joml/joml
+                implementation("org.joml:joml:1.10.8")
             }
         }
     }
