@@ -3,7 +3,7 @@ plugins {
     id("maven-publish")
 }
 
-group = "net.perfectdreams.harmony.math"
+group = "net.perfectdreams.harmony"
 
 repositories {
     mavenCentral()
