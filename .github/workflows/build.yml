@@ -45,7 +45,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
-        run: >
+        run: |
           gh release create "${{ github.sha }}" --draft --title "${{ github.sha }}" --notes "Automated Release"
           gh release upload "${{ github.sha }}" "floormaker-cli/build/distributions/*"
           gh release upload "${{ github.sha }}" "wallpapermaker-cli/build/distributions/*"
