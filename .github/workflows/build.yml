@@ -39,4 +39,16 @@ jobs:
           GRADLE_OPTS: -Xmx4096m -Xms4096m
           ORG_GRADLE_PROJECT_PerfectDreamsUsername: ${{ secrets.PERFECTDREAMS_REPO_USERNAME }}
           ORG_GRADLE_PROJECT_PerfectDreamsPassword: ${{ secrets.PERFECTDREAMS_REPO_PASSWORD }}
-        run: ./gradlew build publish --scan
+        run: ./gradlew build application publish --scan
+
+      - name: Upload CLI tools
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: >
+          gh release create "${{ github.sha }}" --draft --title "${{ github.sha }}" --notes "Automated Release"
+          gh release upload "${{ github.sha }}" "floormaker-cli/build/distributions/*"
+          gh release upload "${{ github.sha }}" "wallpapermaker-cli/build/distributions/*"
+          gh release edit "${{ github.sha }}" --draft=false
+          
+          
