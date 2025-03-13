@@ -3,7 +3,7 @@ plugins {
     application
 }
 
-group = "net.sneakysims.floormaker"
+group = "net.sneakysims.wallpapermaker"
 
 repositories {
     mavenCentral()
@@ -17,5 +17,5 @@ dependencies {
 }
 
 application {
-    this.mainClass = "net.sneakysims.floormaker.cli.FloorMakerCLIKt"
+    this.mainClass = "net.sneakysims.wallpapermaker.cli.WallpaperMakerCLIKt"
 }

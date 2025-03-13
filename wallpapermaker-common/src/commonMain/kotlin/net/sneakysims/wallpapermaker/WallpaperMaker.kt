@@ -1,4 +1,4 @@
-package net.sneakysims.floormaker
+package net.sneakysims.wallpapermaker
 
 import net.perfectdreams.slippyimage.*
 import net.sneakysims.sneakylib.iff.*

@@ -1,4 +1,4 @@
-package net.sneakysims.floormaker.cli
+package net.sneakysims.wallpapermaker.cli
 
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.Context
@@ -10,7 +10,7 @@ import com.github.ajalt.clikt.parameters.types.int
 import net.perfectdreams.slippyimage.PaletteCreator
 import net.perfectdreams.slippyimage.SlippyImage
 import net.perfectdreams.slippyimage.convertToSlippyImage
-import net.sneakysims.floormaker.WallpaperMaker
+import net.sneakysims.wallpapermaker.WallpaperMaker
 import java.io.File
 import javax.imageio.ImageIO
 
