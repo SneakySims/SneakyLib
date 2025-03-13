@@ -44,8 +44,6 @@ object FloorMaker {
             )
         )
 
-        val colors = PaletteCreator.extractColors(sprite)
-
         iff.addChunk(
             IFFChunk.PALT_CHUNK_CODE,
             1537,
