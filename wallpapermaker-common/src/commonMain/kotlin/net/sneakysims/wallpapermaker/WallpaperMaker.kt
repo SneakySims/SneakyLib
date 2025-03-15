@@ -62,19 +62,6 @@ object WallpaperMaker {
 
         iff.addChunk(
             IFFChunk.SPR_CHUNK_CODE,
-            1537,
-            0,
-            null,
-            PALTChunkData(
-                1,
-                0,
-                0,
-                palette
-            )
-        )
-
-        iff.addChunk(
-            IFFChunk.SPR_CHUNK_CODE,
             1,
             16,
             null,
