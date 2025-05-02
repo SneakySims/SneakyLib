@@ -28,6 +28,8 @@ fun main() {
 
             // text.format.strings.addAll(onlyEnglish)
         }
+
+        is STRChunkData.StringFormat.StringFormatFCFF -> TODO()
     }
 
     dumpSPR(iff, "original")

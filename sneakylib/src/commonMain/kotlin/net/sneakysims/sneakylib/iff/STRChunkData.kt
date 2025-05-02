@@ -3,12 +3,21 @@ package net.sneakysims.sneakylib.iff
 import net.sneakysims.sneakylib.sims.TheSimsLanguage
 import net.sneakysims.sneakylib.utils.ByteArrayReader
 import net.sneakysims.sneakylib.utils.ByteArrayWriter
+import net.sneakysims.sneakylib.utils.decodeToStringUsingWindows1252
 
 class STRChunkData(val format: StringFormat) : IFFChunkData() {
     sealed class StringFormat(val formatId: Short) {
         class StringFormatFDFF(val strings: MutableList<SimsString>) : StringFormat(-3) {
             data class SimsString(
-                var language: net.sneakysims.sneakylib.sims.TheSimsLanguage,
+                var language: TheSimsLanguage,
+                var text: String,
+                var description: String
+            )
+        }
+
+        class StringFormatFCFF(val strings: MutableList<SimsString>) : StringFormat(-4) {
+            data class SimsString(
+                var language: TheSimsLanguage,
                 var text: String,
                 var description: String
             )
@@ -50,8 +59,55 @@ class STRChunkData(val format: StringFormat) : IFFChunkData() {
                     return STRChunkData(StringFormat.StringFormatFDFF(strings))
                 }
 
+                -4 -> {
+                    val count = reader.readByte()
+
+                    println("Count is $count")
+
+                    val strings = mutableListOf<StringFormat.StringFormatFCFF.SimsString>()
+
+                    repeat(count.toInt()) {
+                        val stringPairCount = reader.readUShortLe()
+
+                        repeat(stringPairCount.toInt()) {
+                            val language = TheSimsLanguage.getLanguageById(reader.readByte())
+                            println("Language Index: $language")
+
+                            val string = readVariableLengthString(reader, language)
+                            val string2 = readVariableLengthString(reader, language)
+
+                            println("String: \"$string\", String2: \"$string2\"")
+
+                            strings.add(
+                                StringFormat.StringFormatFCFF.SimsString(
+                                    language,
+                                    string,
+                                    string2
+                                )
+                            )
+                        }
+                    }
+
+                    return STRChunkData(StringFormat.StringFormatFCFF(strings))
+                }
+
                 else -> error("Unsupported string format! $formatId")
             }
+        }
+
+        fun readVariableLengthString(reader: ByteArrayReader, language: TheSimsLanguage): String {
+            var length = 0
+            var shift = 0
+
+            while (true) {
+                val byte = reader.readByte().toInt() and 0xFF
+                length = length or ((byte and 0x7F) shl shift)
+                if ((byte and 0x80) == 0) break
+                shift += 7
+            }
+
+            val bytes = reader.readBytes(length)
+            return language.decodeStringFromIFF(bytes)
         }
     }
 
@@ -80,6 +136,10 @@ class STRChunkData(val format: StringFormat) : IFFChunkData() {
 
                 // In reality, it doesn't seem to always be 0xA3, some files do seem to have different characters, some (like Behavior.iff) do have 0xA3
                 // Because it is unused, we'll just keep it as is and carry on, it doesn't seem to affect anything in the game
+            }
+
+            is StringFormat.StringFormatFCFF -> {
+                error("Not supported yet! (FCFF)")
             }
         }
 

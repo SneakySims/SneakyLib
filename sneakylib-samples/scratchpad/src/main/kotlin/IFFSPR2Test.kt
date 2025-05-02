@@ -5,11 +5,17 @@ import java.io.File
 import javax.imageio.ImageIO
 
 fun main() {
-    val input = File("furalhacc.flr")
+    val input = File("asian02.flr")
 
     val iff = IFF.read(input.readBytes())
 
-    dumpSPR2(iff, "furalhacc")
+    iff.chunks.forEach {
+        if (it.code == IFFChunk.STR_CHUNK_CODE) {
+            println(it.decodeDataAsSTR())
+        }
+    }
+
+    dumpSPR2(iff, "asian02")
     /* val iff = IFF.empty()
 
     iff.chunks.add(
@@ -152,14 +158,14 @@ fun main() {
 
 fun dumpSPR2(iff: IFF, prefix: String) {
     for (spr in iff.chunks.filter { it.code == net.sneakysims.sneakylib.iff.IFFChunk.SPR2_CHUNK_CODE }) {
-        val data = spr.data as SPR2ChunkData
+        val data = spr.decodeDataAsSPR2()
 
         println("Palette ID: ${data.paletteId}")
         val palt = iff.chunks
             .filter {
                 it.code == net.sneakysims.sneakylib.iff.IFFChunk.PALT_CHUNK_CODE
             }
-            .first { it.id.toInt() == data.paletteId }.data as PALTChunkData
+            .first { it.id.toInt() == data.paletteId }.decodeDataAsPALT()
 
         for ((index, sprite) in data.sprites.withIndex()) {
             println("Exporting image $index (${sprite.imageData.data.size} rows)")
