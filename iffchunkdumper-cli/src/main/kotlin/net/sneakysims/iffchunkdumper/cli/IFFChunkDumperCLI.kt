@@ -35,7 +35,7 @@ class IFFChunkDumperCLI : CliktCommand() {
             println("Chunk Name: ${chunk.name.joinToString("") { it.toInt().toChar().toString() }}")
             println("-------------------------------------------------------")
 
-            File("${file.nameWithoutExtension}_${chunk.code}_${chunk.id}.bin").writeBytes(iff.write())
+            File("${file.nameWithoutExtension}_${chunk.code}_${chunk.id}.bin").writeBytes(chunk.data)
         }
     }
 }
