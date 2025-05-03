@@ -12,6 +12,28 @@ object FloorMaker {
         sprite: SlippyImage,
         palette: List<Color>
     ): IFF {
+        return createFloorIFF(
+            name,
+            price,
+            description,
+            stepSound,
+            convertToSPR2Sprite(sprite, 31, 16, palette),
+            convertToSPR2Sprite(sprite, 63, 32, palette),
+            convertToSPR2Sprite(sprite, 127, 64, palette),
+            palette
+        )
+    }
+
+    fun createFloorIFF(
+        name: String,
+        price: Int,
+        description: String,
+        stepSound: FloorSound,
+        spriteFar: SPR2ChunkData.SPRSprite,
+        spriteMedium: SPR2ChunkData.SPRSprite,
+        spriteNear: SPR2ChunkData.SPRSprite,
+        palette: List<Color>
+    ): IFF {
         val iff = IFF.empty()
 
         iff.addChunk(
@@ -65,9 +87,7 @@ object FloorMaker {
             SPR2ChunkData(
                 1000,
                 1537,
-                mutableListOf(
-                    convertToSPR2Sprite(sprite, 31, 16, palette)
-                )
+                mutableListOf(spriteFar)
             )
         )
 
@@ -79,9 +99,7 @@ object FloorMaker {
             SPR2ChunkData(
                 1000,
                 1537,
-                mutableListOf(
-                    convertToSPR2Sprite(sprite, 63, 32, palette)
-                )
+                mutableListOf(spriteMedium)
             )
         )
 
@@ -93,9 +111,7 @@ object FloorMaker {
             SPR2ChunkData(
                 1000,
                 1537,
-                mutableListOf(
-                    convertToSPR2Sprite(sprite, 127, 64, palette)
-                )
+                mutableListOf(spriteNear)
             )
         )
 
