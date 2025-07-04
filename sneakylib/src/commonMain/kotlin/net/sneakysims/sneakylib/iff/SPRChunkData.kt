@@ -44,17 +44,39 @@ class SPRChunkData(
             val byteBuffer = ByteArrayReader(byteArray)
 
             // TODO: We need to support big endian here, the game supports both
-            val version = byteBuffer.readIntLe()
+            // Check if it is big endian or little endian
+            var isLittleEndian = false
+            var version = byteBuffer.readInt()
+            if (version !in 502..505) {
+                // Uh oh, this seems to be a little endian SPR#!
+                isLittleEndian = true
+                byteBuffer.position = 0
+                version = byteBuffer.readIntLe() // Re-read it!
+            }
+
+            fun readIntDependingOnDetectedEndianess(): Int {
+                return if (isLittleEndian)
+                    byteBuffer.readIntLe()
+                else
+                    byteBuffer.readInt()
+            }
+
+            fun readShortDependingOnDetectedEndianess(): Short {
+                return if (isLittleEndian)
+                    byteBuffer.readShortLe()
+                else
+                    byteBuffer.readShort()
+            }
 
             println("Version: $version")
 
-            val spriteCount = byteBuffer.readIntLe()
+            val spriteCount = readIntDependingOnDetectedEndianess()
 
-            val paletteId = byteBuffer.readIntLe()
+            val paletteId = readIntDependingOnDetectedEndianess()
             println("fc: $spriteCount")
             println("pal id: $paletteId")
             repeat(spriteCount) {
-                val offsetTable = byteBuffer.readIntLe()
+                val offsetTable = readIntDependingOnDetectedEndianess()
 
                 println("offset table: $offsetTable")
             }
@@ -68,11 +90,11 @@ class SPRChunkData(
                 println(byteBuffer.position)
                 // Version 1001 has +2 fields here: Version and Size
 
-                val unknown0 = byteBuffer.readShortLe() // Always 0
-                val unknown1 = byteBuffer.readShortLe() // Always 0
-                val height = byteBuffer.readShortLe()
-                val width = byteBuffer.readShortLe()
-                val unknown2 = byteBuffer.readShortLe()
+                val unknown0 = readShortDependingOnDetectedEndianess() // Always 0
+                val unknown1 = readShortDependingOnDetectedEndianess() // Always 0
+                val height = readShortDependingOnDetectedEndianess()
+                val width = readShortDependingOnDetectedEndianess()
+                val unknown2 = readShortDependingOnDetectedEndianess()
 
                 println("Width: $width; Height: $height")
 

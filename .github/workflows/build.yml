@@ -54,6 +54,7 @@ jobs:
           gh release upload "${{ steps.vars.outputs.sha_short }}" floormaker-cli/build/distributions/*
           gh release upload "${{ steps.vars.outputs.sha_short }}" wallpapermaker-cli/build/distributions/*
           gh release upload "${{ steps.vars.outputs.sha_short }}" iffchunkdumper-cli/build/distributions/*
+          gh release upload "${{ steps.vars.outputs.sha_short }}" sprchunkdumper-cli/build/distributions/*
           gh release edit "${{ steps.vars.outputs.sha_short }}" --draft=false
           
           
