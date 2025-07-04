@@ -25,7 +25,7 @@ class SPRChunkDumperCLI : CliktCommand() {
         val iff = IFF.read(file.readBytes())
 
         dumpSPR(iff, file.nameWithoutExtension)
-        // dumpSPR2(iff, file.nameWithoutExtension)
+        dumpSPR2(iff, file.nameWithoutExtension)
     }
 
     fun dumpSPR(iff: IFF, prefix: String) {
